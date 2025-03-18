@@ -18,5 +18,8 @@ class Main extends Lib{
     else {
       int z = 4;
     }
+    if(nn){
+      int f = 5;
+    }
   }
 }
