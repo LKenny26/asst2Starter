@@ -149,6 +149,16 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new If(pos,if_exp,true_st,false_st);
     }
 
+    //make a loop accept no expression
+    
+
+    //make a while loop 
+    //: <stmt> ::= `while # `( <exp> `) <stmt> =>
+    public Statement while_maker(int pos, Exp while_exp, Statement while_to_do) {
+        return new While(pos, while_exp, while_to_do);
+    }
+
+
     //: <assign> ::= <exp> # `= <exp> =>
     public Statement assign(Exp lhs, int pos, Exp rhs)
     {

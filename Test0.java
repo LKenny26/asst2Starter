@@ -21,5 +21,9 @@ class Main extends Lib{
     if(nn){
       int f = 5;
     }
+
+    while(nn) {
+      n = n + 1;
+    }
   }
 }
