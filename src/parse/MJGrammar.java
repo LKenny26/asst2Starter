@@ -179,16 +179,20 @@ public class MJGrammar implements MessageObject, FilePosObject
          return new Block(pos, for_block);
     }
 
-    // //: <stmt> ::= ID `++ =>
-    // public Statement increment(String name){
-
-    // }
+    
 
 
     //: <assign> ::= <exp> # `= <exp> =>
     public Statement assign(Exp lhs, int pos, Exp rhs)
     {
         return new Assign(pos, lhs, rhs);
+    }
+
+    //: <assign> ::= <exp> # `++ =>
+    public Statement increment(Exp incrementee, int pos){
+        Exp one = new IntegerLiteral(pos, 1);
+        Exp incremented = new Plus(pos, incrementee, one);
+        return new Assign(pos, incrementee, incremented);
     }
 
     //: <local var decl> ::= <type> # ID `= <exp> =>
