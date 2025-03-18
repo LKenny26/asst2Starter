@@ -25,5 +25,9 @@ class Main extends Lib{
     while(nn) {
       n = n + 1;
     }
+
+    while() {
+      n = n + 2;
+    }
   }
 }

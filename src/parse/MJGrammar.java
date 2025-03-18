@@ -150,7 +150,11 @@ public class MJGrammar implements MessageObject, FilePosObject
     }
 
     //make a loop accept no expression
-    
+    //: <stmt> ::= `while # `( !<exp> `) <stmt> =>
+    public Statement while_no_exp(int pos, Statement while_to_do){
+        Exp true_exp = new True(pos);
+        return new While(pos, true_exp, while_to_do);
+    }
 
     //make a while loop 
     //: <stmt> ::= `while # `( <exp> `) <stmt> =>
