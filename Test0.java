@@ -11,5 +11,12 @@ class Main extends Lib{
     int n = 3+4*5;
     boolean nn = (int[][])(String)(Object)z;
     int k = - - - -n;
+
+    if (nn){
+      int y = 2;
+    }
+    else {
+      int z = 4;
+    }
   }
 }

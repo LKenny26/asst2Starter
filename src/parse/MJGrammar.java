@@ -136,6 +136,19 @@ public class MJGrammar implements MessageObject, FilePosObject
     }
     //: <stmt> ::= <local var decl> `; => pass
 
+    // What to do if there is no else in the if statement
+    // //: <stmt> ::= `if # `( <exp> `) <stmt> !`else =>
+    // public Statement if_no_else_maker(int pos, Exp if_exp, Statement true_st) {
+    //     Statement false_st = new Block(pos, new StatementList());
+    //     return new If(pos, if_exp, true_st, false_st);
+    // }
+
+    // What to do if there is an else statement
+    //: <stmt> ::= `if # `( <exp> `) <stmt> `else <stmt> =>
+    public Statement if_maker(int pos, Exp if_exp, Statement true_st, Statement false_st){
+        return new If(pos,if_exp,true_st,false_st);
+    }
+
     //: <assign> ::= <exp> # `= <exp> =>
     public Statement assign(Exp lhs, int pos, Exp rhs)
     {
