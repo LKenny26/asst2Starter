@@ -2,7 +2,7 @@
 // Note that it has semantic errors, such as references to undefined
 // and mismatched types--but these will not be caught until Assignment 3
 // and Assignment 4.
-class Main { 
+class Main extends Lib{ 
   /* this is a comment */
   /*/ this is another comment */
   /*   /* this is another comment */

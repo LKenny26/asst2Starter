@@ -77,10 +77,18 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Program(pos, new ClassDeclList(vec));
     }
 
+    // This is one where it doesnt extend so it should just be object and 
+    // was prewritten
     //: <class decl> ::= `class # ID `{ <decl in class>* `} =>
     public ClassDecl createClassDecl(int pos, String name, List<Decl> vec)
     {
         return new ClassDecl(pos, name, "Object", new DeclList(vec));
+    }
+
+     // what to do when it does actually extend
+    //: <class decl> ::= `class # ID `extends ID `{ <decl in class>* `} =>
+    public ClassDecl creatClassDecl(int pos, String name, String extension, List<Decl> vec) {
+        return new ClassDecl(pos, name, extension, new DeclList(vec));
     }
 
     //: <decl in class> ::= <method decl> => pass
