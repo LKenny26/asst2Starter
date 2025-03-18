@@ -1,4 +1,5 @@
 package parse;
+import java.beans.Expression;
 import java.util.List;
 import errorMsg.*;
 import syntaxtree.*;
@@ -149,7 +150,7 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new If(pos,if_exp,true_st,false_st);
     }
 
-    //make a loop accept no expression
+    //make a loop with no expression
     //: <stmt> ::= `while # `( !<exp> `) <stmt> =>
     public Statement while_no_exp(int pos, Statement while_to_do){
         Exp true_exp = new True(pos);
@@ -161,6 +162,27 @@ public class MJGrammar implements MessageObject, FilePosObject
     public Statement while_maker(int pos, Exp while_exp, Statement while_to_do) {
         return new While(pos, while_exp, while_to_do);
     }
+
+    //make a for loop a while loop
+    //: <stmt> ::= `for # `( <stmt> `; <exp> `; <stmt> `) <stmt> =>
+    public Statement for_to_while(int pos, Statement c1, Exp c2, Statement c3, Statement for_body) {
+        //while body is the for body plus clause 3
+        StatementList while_body = new StatementList();
+        while_body.add(for_body);
+        while_body.add(c3);
+        Statement while_body_block = new Block(pos, while_body);
+        While while_loop =  new While(pos, c2, while_body_block);
+
+        StatementList for_block = new StatementList();
+        for_block.add(c1);
+        for_block.add(while_loop);
+         return new Block(pos, for_block);
+    }
+
+    // //: <stmt> ::= ID `++ =>
+    // public Statement increment(String name){
+
+    // }
 
 
     //: <assign> ::= <exp> # `= <exp> =>

@@ -28,6 +28,13 @@ class Main extends Lib{
 
     while() {
       n = n + 2;
+      int m = 2;
     }
+
+    int z = 4;
+    // for (int i = 0; i < 100; i++) {
+		// 	z = z + i;
+		// }
+
   }
 }
