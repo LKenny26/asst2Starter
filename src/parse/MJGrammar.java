@@ -473,7 +473,16 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Call(pos, new This(pos), name, expList);
     }
 
-    // //: <callExp> ::=
+    //: <callExp> ::= # <exp1> `. ID `( <expr list>? `) =>
+    public Exp call_dot(int pos, Exp e1, String name, ExpList list) {
+        return new Call(pos, e1, name, list);
+    }
+
+    //: <callExp> ::= # `super `. ID `( <expr list>? `) =>
+    public Exp call_super(int pos, String name, ExpList list) {
+        return new Call(pos, new Super(pos), name, list);
+    }
+
 
     //================================================================
     // Lexical grammar for filtered language begins here: DO NOT
