@@ -32,10 +32,10 @@ class Main extends Lib{
     }
 
     int z = 4;
-    z++;
-    // for (int i = 0; i < 100; i++) {
-		// 	z = z + i;
-		// }
 
+    
+  }
+  public int method(){
+    return 4;
   }
 }

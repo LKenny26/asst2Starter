@@ -6,6 +6,7 @@ class MyClass extends YourClass {
     public void def(String x, int[] arr, boolean z) { a = b; c = d; }
     public int aaa() { return 3; }
     boolean[] b;
+    
     String zzz;
     public boolean bbb(int x) { a = x; return true; }
     public String[] ccc(boolean b, String[][] s) {x = h; z = r; return null; }

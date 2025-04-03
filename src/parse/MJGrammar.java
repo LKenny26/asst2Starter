@@ -94,12 +94,49 @@ public class MJGrammar implements MessageObject, FilePosObject
 
     //: <decl in class> ::= <method decl> => pass
 
-    //: <method decl> ::= `public `void # ID `( `) `{ <stmt>* `} =>
+    //void method decl by libby 
+    //: <method decl> ::= `public `void # ID `( !<formal decl list> `) `{ <stmt>* `} =>
     public Decl createMethodDeclVoid(int pos, String name, List<Statement> stmts)
     {
         return new MethodDeclVoid(pos, name, new VarDeclList(new VarDeclList()),
                                   new StatementList(stmts));
     }
+
+    // void with decls
+    //: <method decl> ::= `public `void # ID `( <formal decl list> `) `{ <stmt>* `} =>
+    public Decl createMethodDeclVoid(int pos, String name, VarDeclList list, List<Statement> stmts) {
+        return new MethodDeclVoid(pos, name, list, null);
+    }
+
+
+    // method decl 
+    //: <method decl> ::= `public # <type> ID `( !<formal decl list> `) `{ <stmt>* `return <exp> `; `} =>
+    public Decl createMethodDeclNonVoid(int pos, Type type, String name, List<Statement> stmts, Exp return_exp) {
+        return new MethodDeclNonVoid(pos, type, name, new VarDeclList(), new StatementList(stmts),return_exp);
+    }
+
+    //:<method decl> ::= `public # <type> ID `( <formal decl list> `) `{ <stmt>* `return <exp> `; `} => 
+    public Decl createMethodDeclNonVoid(int pos, Type type, String name, VarDeclList list, List<Statement> stmts, Exp returnExp) {
+        return new MethodDeclNonVoid(pos, type, name, list, new StatementList(stmts), returnExp);
+    }
+
+
+    //// :<formal decl list> ::= <formal decl list> commaDecl*
+    // // :<formal decl list> ::= <formal var decl>
+    //// : commaDecl ::= `, <formal var decl>
+    
+    //: <formal decl list> ::= # <formal var decl> <commaDecl>* =>
+    public VarDeclList makeMethodDecls(int pos, VarDecl decl, List<VarDecl> commaList){
+        VarDeclList list = new VarDeclList(commaList);
+        list.addElementAtFront(decl);
+        return list;
+    }
+
+    //: <commaDecl> ::= `, # <formal var decl> =>
+    public VarDecl makingList(int pos, VarDecl fdecl) {
+        return fdecl;
+    }
+
 
     //: <type> ::= # `int =>
     public Type intType(int pos)
@@ -121,6 +158,10 @@ public class MJGrammar implements MessageObject, FilePosObject
     {
         return new ArrayType(pos, t);
     }
+    //: <type> ::= # `null =>
+    public Type newNullType(int pos) {
+        return new NullType(pos);
+    }
 
     //: <empty bracket pair> ::= `[ `] => null
 
@@ -136,6 +177,7 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Block(pos, new StatementList(sl));
     }
     //: <stmt> ::= <local var decl> `; => pass
+    
 
     //What to do if there is no else in the if statement
     //: <stmt> ::= `if # `( <exp> `) <stmt> !`else =>
@@ -195,11 +237,31 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Assign(pos, incrementee, incremented);
     }
 
+    public Statement deincrement(Exp deincrementee, int pos) {
+        Exp one = new IntegerLiteral(pos, 1);
+        Exp deincremented = new Minus(pos, deincrementee, one);
+        return new Assign(pos, deincrementee, deincremented);
+    }
+
     //: <local var decl> ::= <type> # ID `= <exp> =>
     public Statement localVarDecl(Type t, int pos, String name, Exp init)
     {
         return new LocalDeclStatement(pos, new LocalVarDecl(pos, t, name, init));
     }
+
+    //: <decl in class> ::= <inst var decl> => pass
+
+    //: <inst var decl>  ::= # <type> ID `; =>
+    public Decl inst(int pos, Type type, String name) {
+        return new InstVarDecl(pos, type, name);
+    }
+
+
+    //: <formal var decl> ::= # <type> ID =>
+    public VarDecl formal(int pos, Type type, String name) {
+        return new FormalDecl(pos, type, name);
+    }
+
 
     //================================================================
     // expressions
@@ -209,29 +271,101 @@ public class MJGrammar implements MessageObject, FilePosObject
 
     // these precedence levels have not been filled in at all, so there
     // are only pass-through productions
+    //-----------------------------------------
     //: <exp8> ::= <exp7> => pass
+     //: <exp8> ::= <exp8> # `|| <exp7> =>
+     public Exp newOr(Exp e1, int pos, Exp e2) {
+        return new Or(pos, e1, e2);
+    }
+    //-----------------------------------------
     //: <exp7> ::= <exp6> => pass
+    //: <exp7> ::= <exp7> # `&& <exp6> =>
+    public Exp newAnd(Exp e1, int pos, Exp e2) {
+        return new And(pos, e1, e2);
+    }
+    //-----------------------------------------
     //: <exp6> ::= <exp5> => pass
+    //: <exp6> ::= <exp6> # `== <exp5> =>
+    public Exp newEquals(Exp e1, int pos, Exp e2) {
+        return new Equals(pos, e1, e2);
+    }
+
+    //: <exp6> ::= <exp6> # `!= <exp5> =>
+    public Exp newNotEquals(Exp e1, int pos, Exp e2) {
+        return new Not(pos, new Equals(pos, e1, e2));
+    }
+
+    //-----------------------------------------
     //: <exp5> ::= <exp4> => pass
 
+    //: <exp5> ::= <exp5> # `< <exp4> =>
+    public Exp newLess(Exp e1, int pos, Exp e2) {
+        return new LessThan(pos, e1, e2);
+    }
+
+    //: <exp5> ::= <exp5> # `> <exp4> =>
+    public Exp newGreater(Exp e1, int pos, Exp e2) {
+        return new GreaterThan(pos, e1, e2);
+    }
+
+    //: <exp5> ::= <exp5> # `<= <exp4> =>
+    public Exp newLessEquals(Exp e1, int pos, Exp e2) {
+        return new Not(pos, new GreaterThan(pos, e1, e2));
+    }
+
+    //: <exp5> ::= <exp5> # `>= <exp4> =>
+    public Exp newGreatEquals(Exp e1, int pos, Exp e2) {
+        return new Not(pos, new LessThan(pos, e1, e2));
+    }
+
+    //: <exp5> ::= <exp5> # `instanceof <type> =>
+    public Exp newInstanceOf(Exp e1, int pos, Type type) {
+        return new InstanceOf(pos, e1, type);
+    }
     // these remaining precedence levels have been filled in to some extent,
     // but most or all of them have need to be expanded
-
+    //-----------------------------------------
+    //: <exp4> ::= <exp3> => pass
     //: <exp4> ::= <exp4> # `+ <exp3> =>
     public Exp newPlus(Exp e1, int pos, Exp e2)
     {
         return new Plus(pos, e1, e2);
     }
-    //: <exp4> ::= <exp3> => pass
+    
 
+    //: <exp4> ::= <exp4> # `- <exp3> =>
+    public Exp newMinus(Exp e1, int pos, Exp e2) {
+        return new Minus(pos, e1, e2);
+    }
+    
+    //-----------------------------------------
+
+    //: <exp3> ::= <exp2> => pass
     //: <exp3> ::= <exp3> # `* <exp2> =>
     public Exp newTimes(Exp e1, int pos, Exp e2)
     {
         return new Times(pos, e1, e2);
     }
-    //: <exp3> ::= <exp2> => pass
+
+    //: <exp3> ::= <exp3> # `/ <exp2> =>
+    public Exp newDivide(Exp e1, int pos, Exp e2)
+    {
+        return new Divide(pos, e1, e2);
+    }
+
+    //: <exp3> ::= <exp3> # `% <exp2> =>
+    public Exp newModulo(Exp e1, int pos, Exp e2) {
+        return new Remainder(pos, e1, e2);
+    }
 
     //: <exp2> ::= <cast exp> => pass
+
+    //: <unary exp> ::= `! # <unary exp> =>
+    public Exp newNot(int pos, Exp e1) {
+        return new Not(pos, e1);
+    }
+
+
     //: <exp2> ::= <unary exp> => pass
 
     //: <cast exp> ::= # `( <type> `) <cast exp> =>
@@ -246,6 +380,13 @@ public class MJGrammar implements MessageObject, FilePosObject
     {
         return new Minus(pos, new IntegerLiteral(pos, 0), e);
     }
+
+    //: <unary exp> ::= # `+ <unary exp> =>
+    public Exp positive(int pos, Exp pos_plus){
+        Exp zero = new IntegerLiteral(pos, 0);
+        return new Plus(pos, zero, pos_plus);
+    }
+
     //: <unary exp> ::= <exp1> => pass
 
     //: <exp1> ::= # ID  =>
@@ -263,6 +404,29 @@ public class MJGrammar implements MessageObject, FilePosObject
     {
         return new IntegerLiteral(pos, n);
     }
+    //: <exp1> ::= # STRINGLIT =>
+    public Exp string_lit(int pos, String string) {
+        return new StringLiteral(pos, string);
+    }
+    //: <exp1> ::= # `null =>
+    public Exp null_exp(int pos) {
+        return new Null(pos);
+    }
+    //: <exp1> ::= # `true =>
+    public Exp true_exp(int pos) {
+        return new True(pos);
+    }
+
+    //: <exp1> ::= # `false =>
+    public Exp false_exp(int pos) {
+        return new False(pos);
+    }
+
+    //: <exp1> ::= # CHARLIT => 
+    public Exp char_exp(int pos, int n) {
+        return new IntegerLiteral(pos, n);
+    }
+
 
     //================================================================
     // Lexical grammar for filtered language begins here: DO NOT

@@ -5,9 +5,9 @@ class Main extends Lib {
 		int z = x + y;
 	}
 	public int add(int z, int b) {
-		for (int i = 0; i < 100; i++) {
-			z = z + i;
-		}
+		// for (int i = 0; i < 100; i++) {
+		// 	z = z + i;
+		// }
 		return z + b;
 	}
 }
