@@ -427,6 +427,53 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new IntegerLiteral(pos, n);
     }
 
+    //: <exp1> ::= # `this =>
+    public Exp this_exp(int pos){
+        return new This(pos);
+    }
+
+    //: <exp1> ::= <exp1> # `. ID =>
+    public Exp dot_exp(Exp e1, int pos, String name){
+        return new InstVarAccess(pos, e1, name);
+    }
+
+    //: <exp1> ::= `new # ID `( `) =>
+    public Exp new_exp(int pos, String name){
+        IdentifierType id_type = new IdentifierType(pos, name);
+        return new NewObject(pos, id_type);
+    }
+
+    // //: <exp1> ::= `( <exp> `) =>
+    // public Exp exp(Exp e) {
+    //     return e;
+    // }
+
+    //: <exp1> ::= `new # <type> `[ <exp> `] <empty bracket pair>* =>
+    public Exp new_array(int pos, Type type, Exp e, List<Object> size) {
+        return new NewArray(pos, type, e);
+    }
+
+    
+
+    
+    //: <expr list> ::= # <exp> <commaExp>* =>
+    public ExpList exp_list(int pos, Exp exp, List<Exp> commaExpList){
+        ExpList list = new ExpList(commaExpList);
+        list.addElementAtFront(exp);
+        return list;
+    }
+    //: <commaExp> ::= `, # <exp> =>
+    public Exp makingExpList(int pos, Exp exp) {
+        return exp;
+    }
+
+    //: <exp1> ::= <callExp> => pass
+    //: <callExp> ::= # ID `( <expr list>? `) =>
+    public Exp call(int pos, String name, ExpList expList) {
+        return new Call(pos, new This(pos), name, expList);
+    }
+
+    // //: <callExp> ::=
 
     //================================================================
     // Lexical grammar for filtered language begins here: DO NOT
