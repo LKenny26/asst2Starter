@@ -177,7 +177,10 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Block(pos, new StatementList(sl));
     }
     //: <stmt> ::= <local var decl> `; => pass
-    
+    //: <stmt> ::= # <callExp> `; => 
+    public Statement call_exp_stmt(int pos, Exp call) {
+        return new CallStatement(pos, (Call)call);
+    }
 
     //What to do if there is no else in the if statement
     //: <stmt> ::= `if # `( <exp> `) <stmt> !`else =>
@@ -221,6 +224,17 @@ public class MJGrammar implements MessageObject, FilePosObject
          return new Block(pos, for_block);
     }
 
+    //: <stmt> ::= # `; =>
+    public Statement empty(int pos){
+        Statement s = new Block(pos, new StatementList());
+        return s;
+    }
+
+    //: <stmt> ::= # `break `; =>
+    public Statement break_stmt(int pos){
+        return new Break(pos);
+    }
+
     
 
 
@@ -237,7 +251,22 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new Assign(pos, incrementee, incremented);
     }
 
+    //: <assign> ::= <exp> # `-- =>
     public Statement deincrement(Exp deincrementee, int pos) {
+        Exp one = new IntegerLiteral(pos, 1);
+        Exp deincremented = new Minus(pos, deincrementee, one);
+        return new Assign(pos, deincrementee, deincremented);
+    }
+
+    //: <assign> ::= `++ <exp> #  =>
+    public Statement preincrement(Exp incrementee, int pos){
+        Exp one = new IntegerLiteral(pos, 1);
+        Exp incremented = new Plus(pos, incrementee, one);
+        return new Assign(pos, incrementee, incremented);
+    }
+
+    //: <assign> ::= `-- <exp> #  =>
+    public Statement predeincrement(Exp deincrementee, int pos) {
         Exp one = new IntegerLiteral(pos, 1);
         Exp deincremented = new Minus(pos, deincrementee, one);
         return new Assign(pos, deincrementee, deincremented);
@@ -255,6 +284,8 @@ public class MJGrammar implements MessageObject, FilePosObject
     public Decl inst(int pos, Type type, String name) {
         return new InstVarDecl(pos, type, name);
     }
+
+    
 
 
     //: <formal var decl> ::= # <type> ID =>
@@ -443,8 +474,8 @@ public class MJGrammar implements MessageObject, FilePosObject
         return new NewObject(pos, id_type);
     }
 
-    // //: <exp1> ::= `( <exp> `) =>
-    // public Exp exp(Exp e) {
+    // //: <exp1> ::= # `( <exp> `) => 
+    // public Exp parens(int pos, Exp e){
     //     return e;
     // }
 

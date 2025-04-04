@@ -21,7 +21,7 @@ class MyClass {
 	a = -+x;
 	a = +-9;
 	a = +!z;
-	a = (someVal)-a;
+	// a = (someVal)-a;
 	a = -x+!y%z&&w*a-b==c+d!=e<=f>=g<h>i/j;
     }
 }
